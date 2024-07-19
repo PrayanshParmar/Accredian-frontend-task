@@ -1,13 +1,16 @@
-import Dashborad from "@/components/dashborad/dashboard";
 import { Toaster } from "@/components/ui/toaster";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Routes from "@/routes";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <>
-      <div className="w-full h-full">
-        <Dashborad />
+      <QueryClientProvider client={queryClient}>
+        <Routes />
         <Toaster />
-      </div>
+      </QueryClientProvider>
     </>
   );
 }

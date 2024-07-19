@@ -22,9 +22,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { DialogFooter } from "@/components/ui/dialog";
-import { postReferalFriendHandler } from "@/api/referal/referal";
+import { ReferFriendHandler } from "@/api/referal/referal";
+import { ReferSuccess } from "@/lib/res_types";
 
-const formSchema = z.object({
+const referSchema = z.object({
   name: z.string().min(3, {
     message: "Name must be at least 3 characters.",
   }),
@@ -53,8 +54,8 @@ const programOptions = [
 const ReferForm: React.FC<ReferFormProps> = ({ setIsReferDialogOpen }) => {
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof referSchema>>({
+    resolver: zodResolver(referSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -62,27 +63,28 @@ const ReferForm: React.FC<ReferFormProps> = ({ setIsReferDialogOpen }) => {
     },
   });
 
-  const { mutate: postReferalFriendMutate } = useMutation({
-    mutationKey: ["post-referal-friend"],
-    mutationFn: postReferalFriendHandler,
-    onError: () => {
-      toast({
-        title: "Something went wrong!",
-        variant: "destructive",
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Yup, We have send a referal email to your friend",
-        variant: "success",
-      });
-    },
-  });
+  const { mutate: ReferFriendMutate, isPending: ReferFriendIsPending } =
+    useMutation({
+      mutationKey: ["refer-friend"],
+      mutationFn: ReferFriendHandler,
+      onError: (error: Error) => {
+        toast({
+          title: error.message,
+          variant: "destructive",
+        });
+      },
+      onSuccess: (data: ReferSuccess) => {
+        toast({
+          title: data.message,
+          variant: "success",
+        });
+      },
+    });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: z.infer<typeof referSchema>) {
     console.log(data);
     setIsReferDialogOpen(false);
-    postReferalFriendMutate(data);
+    ReferFriendMutate(data);
   }
 
   return (
@@ -95,7 +97,11 @@ const ReferForm: React.FC<ReferFormProps> = ({ setIsReferDialogOpen }) => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter name" {...field} />
+                <Input
+                  disabled={ReferFriendIsPending}
+                  placeholder="Enter name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,7 +114,11 @@ const ReferForm: React.FC<ReferFormProps> = ({ setIsReferDialogOpen }) => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter email" {...field} />
+                <Input
+                  disabled={ReferFriendIsPending}
+                  placeholder="Enter email"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,7 +139,11 @@ const ReferForm: React.FC<ReferFormProps> = ({ setIsReferDialogOpen }) => {
                 <SelectContent>
                   {programOptions.map((items, index) => {
                     return (
-                      <SelectItem key={index} value={items.value}>
+                      <SelectItem
+                        disabled={ReferFriendIsPending}
+                        key={index}
+                        value={items.value}
+                      >
                         {items.label}
                       </SelectItem>
                     );
@@ -141,7 +155,9 @@ const ReferForm: React.FC<ReferFormProps> = ({ setIsReferDialogOpen }) => {
           )}
         />
         <DialogFooter className=" max-sm:space-y-2">
-          <Button type="submit">Refer</Button>
+          <Button disabled={ReferFriendIsPending} type="submit">
+            Refer
+          </Button>
           <Button variant="outline" onClick={() => setIsReferDialogOpen(false)}>
             Cancel
           </Button>
