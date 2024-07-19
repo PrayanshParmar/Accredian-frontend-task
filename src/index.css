@@ -35,6 +35,8 @@ body,
     --chart-4: 240 1% 42%;
     --chart-5: 240 2% 26%;
     --radius: 0.5rem;
+    --success: 120 60% 50%;
+    --success-foreground: 120 0% 98%;
   }
 
   .dark {

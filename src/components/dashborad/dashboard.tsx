@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,8 +38,18 @@ import {
   ChartTooltip,
   ChartContainer,
 } from "@/components/ui/chart";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import ReferForm from "./refer-form";
 
 const Dashborad = () => {
+  const [isReferDialogOpen, setIsReferDialogOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen flex-col ">
       <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b  px-4 backdrop-blur-md sm:px-6">
@@ -51,7 +62,12 @@ const Dashborad = () => {
             <ReplyIcon className="h-5 w-5" />
             <span className="sr-only">Feedback</span>
           </Button>
-          <Button className="rounded-md px-4 py-2">Refer</Button>
+          <Button
+            className="rounded-md px-4 py-2"
+            onClick={() => setIsReferDialogOpen(true)}
+          >
+            Refer
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -185,6 +201,20 @@ const Dashborad = () => {
           </Card>
         </div>
       </main>
+      <Dialog open={isReferDialogOpen} onOpenChange={setIsReferDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-card text-card-foreground">
+          <DialogHeader>
+            <DialogTitle>Refer a Friend</DialogTitle>
+            <DialogDescription>
+              Enter your friend's name, email, and the program you'd like to
+              refer them to.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <ReferForm setIsReferDialogOpen={setIsReferDialogOpen} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
